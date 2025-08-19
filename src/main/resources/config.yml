@@ -55,3 +55,8 @@ style:
   outpost-icon: assets/tower.png
   outpost-icon-anchor-x: 8
   outpost-icon-anchor-y: 8
+  # Icons for towns put up to sale
+  for-sale-icon-enabled: true
+  for-sale-icon: assets/chest.png
+  for-sale-icon-anchor-x: 8
+  for-sale-icon-anchor-y: 8
