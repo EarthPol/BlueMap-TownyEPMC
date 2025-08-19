@@ -1,6 +1,5 @@
 package codes.antti.bluemaptowny;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -37,7 +36,6 @@ import com.palmergames.bukkit.towny.object.Town;
 import com.palmergames.bukkit.towny.object.TownyObject;
 import com.palmergames.bukkit.towny.object.TownyWorld;
 import com.palmergames.bukkit.towny.utils.TownRuinUtil;
-import com.technicjelle.UpdateChecker;
 
 import de.bluecolored.bluemap.api.BlueMapAPI;
 import de.bluecolored.bluemap.api.math.Color;
@@ -49,13 +47,6 @@ public final class BlueMapTowny extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        try {
-            UpdateChecker updateChecker = new UpdateChecker("Chicken", "BlueMap-Towny", getDescription().getVersion());
-            updateChecker.check();
-            updateChecker.logUpdateMessage(getLogger());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         boolean isFolia = isFolia();
         BlueMapAPI.onEnable((api) -> {
             reloadConfig();
@@ -188,7 +179,12 @@ public final class BlueMapTowny extends JavaPlugin {
 
         String nation = town.hasNation() ? Objects.requireNonNull(town.getNationOrNull()).getName().replace("_", " ") : "";
         t = t.replace("%nation%", nation);
+        t = t.replace("%nationflag%", town.hasNation() ? Objects.requireNonNull(town.getNationOrNull()).getName() : "");
         t = t.replace("%nationstatus%", town.hasNation() ? (town.isCapital() ? "Capital of " + nation : "Member of " + nation) : "");
+
+        if(town.isForSale()){
+            t = t.replace("%forsaleprice%", String.valueOf(town.getForSalePrice()));
+        }
 
         t = t.replace("%public%", town.isPublic() ? "true" : "false");
 
@@ -351,6 +347,15 @@ public final class BlueMapTowny extends JavaPlugin {
                                     .label(townName)
                                     .detail(townDetails)
                                     .icon(this.config.getString("style.home-icon"), this.config.getInt("style.home-icon-anchor-x", 8), this.config.getInt("style.home-icon-anchor-y", 8))
+                                    .styleClasses("towny-icon")
+                                    .position(spawn.get().getX(), spawn.get().getY(), spawn.get().getZ())
+                                    .build();
+                            markers.put("towny." + townName + ".icon", iconMarker);
+                        } else if (this.config.getBoolean("style.for-sale-icon-enabled") && town.isForSale()) {
+                            POIMarker iconMarker = new POIMarker.Builder()
+                                    .label(townName)
+                                    .detail(townDetails)
+                                    .icon(this.config.getString("style.sale-icon"), this.config.getInt("style.sale-icon-anchor-x", 8), this.config.getInt("style.sale-icon-anchor-y", 8))
                                     .styleClasses("towny-icon")
                                     .position(spawn.get().getX(), spawn.get().getY(), spawn.get().getZ())
                                     .build();
